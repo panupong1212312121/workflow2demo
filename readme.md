@@ -27,7 +27,7 @@
 
 3.  **ตั้งค่าและรัน:** กดปุ่ม **Run** เพื่อสร้าง Container จาก Image นั้น พร้อมตั้งค่าพอร์ตให้เป็นไปตามที่กำหนด (โดยปกติ Docker Compose จะจัดการพอร์ตให้แล้ว แต่ควรตรวจสอบว่าพอร์ต **`5678`** ถูก Mapping เรียบร้อยแล้ว)
 
-    ![docker_container_setting](C:\Users\Panupong Jindarat\Desktop\Project\Present\N8N\asset\docker-container-n8n-setting.png)
+    ![docker_container_setting](https://github.com/panupong1212312121/workflow2demo/blob/main/asset/docker-container-n8n-setting.png)
 
 4.  **เข้าใช้งาน n8n:** เมื่อ Container รันสำเร็จ เข้าใช้งาน n8n ผ่าน Web Browser:
 
@@ -57,7 +57,7 @@ ngrok ทำหน้าที่เป็นสะพานเชื่อม�
 
 5.  **คัดลอก Public URL:** ngrok จะแสดง URL สาธารณะที่ใช้งานได้ (Forwarding URL) ซึ่งขึ้นต้นด้วย `https://` **คัดลอก URL นี้ไว้**
 
-    ![ngrok_terminal_URL](C:\Users\Panupong Jindarat\Desktop\Project\Present\N8N\asset\ngrok-terminal-url.png)
+    ![ngrok_terminal_URL](https://github.com/panupong1212312121/workflow2demo/blob/main/asset/ngrok-terminal-url.png)
 
 -----
 
