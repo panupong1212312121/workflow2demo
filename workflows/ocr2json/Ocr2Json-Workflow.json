@@ -1,0 +1,460 @@
+{
+  "name": "Ocr2Json Thai (1st draft)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Node ที่ใช้",
+        "height": 496,
+        "width": 1040,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        -16
+      ],
+      "id": "bb10c3de-2a2f-4f09-8d97-50218e9de320",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        288
+      ],
+      "id": "1eb93558-8b50-4c19-aa23-b2105b14d3e0",
+      "name": "Structured Output Parser",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -384,
+        80
+      ],
+      "id": "45f31f45-7ec2-4b07-88bc-9c84ae69606b",
+      "name": "On form submission",
+      "webhookId": "b1c915fa-d692-4aca-8d29-71e8bd7c550a",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// รับข้อมูล input ทั้งหมด\n\nconst items = $input.all();\n\n\n\n// วนลูปเพื่อเข้าถึงแต่ละรายการ (item)\n\nfor (const item of items) {\n\n  // รับค่า submittedAt จาก JSON\n\n  const submittedAt = item.json.submittedAt;\n\n\n\n  // สร้าง object วันที่จากค่า ISO 8601 string\n\n  const dateObj = new Date(submittedAt);\n\n\n\n  // ดึงส่วนต่างๆ ของวันที่และเวลา\n\n  const year = dateObj.getFullYear();\n\n  const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // เดือนเริ่มจาก 0\n\n  const day = String(dateObj.getDate()).padStart(2, '0');\n\n  const hours = String(dateObj.getHours()).padStart(2, '0');\n\n  const minutes = String(dateObj.getMinutes()).padStart(2, '0');\n\n  const seconds = String(dateObj.getSeconds()).padStart(2, '0');\n\n\n\n  // สร้าง string วันที่และเวลาในรูปแบบที่ต้องการ\n\n  const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;\n\n\n\n  // เพิ่ม field ใหม่ใน JSON เพื่อเก็บค่าที่แปลงแล้ว\n\n  item.json.formattedDate = formattedDate;\n\n\n\n  // *** เพิ่มโค้ดส่วนนี้เพื่อเพิ่ม key 'candidate_source' ***\n\n  item.json.candidateSource = 'https://drive.google.com/drive/u/0/folders/1ElR8WmzK0tc2XtKqdfVHNpbx9VqWwvYP';\n\n}\n\n\n\n// ส่งผลลัพธ์กลับ\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        288
+      ],
+      "id": "e25586a0-f8e9-4b12-be10-a1e4d8cc679b",
+      "name": "Code",
+      "executeOnce": false,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# Workflow",
+        "height": 544,
+        "width": 1712,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        512
+      ],
+      "id": "37b322b6-274c-4900-a512-e2979f121d15",
+      "name": "Sticky Note",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-4b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        272
+      ],
+      "id": "1062564b-bfbc-4c8d-82c7-b5702f5189da",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "7BKnI6f4HZNF914R",
+          "name": "OpenRouter account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=./{{ $json['Tax Invoice'].filename }}",
+        "dataPropertyName": "Tax_Invoice",
+        "options": {}
+      },
+      "id": "9f29d3f2-a094-4cfb-b0df-2021b2204826",
+      "name": "Write File to Disk",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        -320,
+        672
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "formTitle": "Tax Invoice Form",
+        "formDescription": "=Allow only 1 file",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Tax Invoice",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".pdf, .jpeg, .jpg, .png",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "customCss": ""
+        }
+      },
+      "id": "70eab06f-c498-419d-9ccb-e6452d5b4e0d",
+      "name": "Tax Invoice Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [
+        -576,
+        672
+      ],
+      "webhookId": "5765e662-ef3b-4017-b85a-75c30625e0e7",
+      "typeVersion": 2.2,
+      "executeOnce": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"invoice_no\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"issue_date\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"seller_details\": {\n\t\t\t\"type\": \"object\",\n\t\t\t\"properties\": {\n\t\t\t\t\"seller_name\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t},\n\t\t\t\t\"seller_tax_id\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t},\n\t\t\t\t\"seller_address\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t\t\"buyer_details\": {\n\t\t\t\"type\": \"object\",\n\t\t\t\"properties\": {\n\t\t\t\t\"buyer_firstname\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t},\n\t\t\t\t\"buyer_lastname\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t},\n\t\t\t\t\"buyer_tax_id\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t},\n\t\t\t\t\"buyer_address\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t\t\"line_items\": {\n\t\t\t\"type\": \"array\",\n\t\t\t\"items\": {\n\t\t\t\t\"type\": \"object\",\n\t\t\t\t\"properties\": {\n\t\t\t\t\t\"item_name\": {\n\t\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t\t},\n\t\t\t\t\t\"item_qty\": {\n\t\t\t\t\t\t\"type\": \"number\",\n\t\t\t\t\t\t\"multipleOf\": 0.01 \n\t\t\t\t\t},\n\t\t\t\t\t\"unit_price\": {\n\t\t\t\t\t\t\"type\": \"number\",\n\t\t\t\t\t\t\"multipleOf\": 0.01 \n\t\t\t\t\t},\n\t\t\t\t\t\"line_net_total\": {\n\t\t\t\t\t\t\"type\": \"number\",\n\t\t\t\t\t\t\"multipleOf\": 0.01 \n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t\t\"financial_summary\": {\n\t\t\t\"type\": \"object\",\n\t\t\t\"properties\": {\n\"total_amount_inc_discount_tax\": {\n\t\t\t\t\t\"type\": \"number\",\n\t\t\t\t\t\"multipleOf\": 0.01 \n\t\t\t\t},\n\t\t\t\t\"net_discount\": {\n\t\t\t\t\t\"type\": \"number\",\n\t\t\t\t\t\"multipleOf\": 0.01 \n\t\t\t\t},\n\"total_amount_excl_discount_inc_tax\": {\n\t\t\t\t\t\"type\": \"number\",\n\t\t\t\t\t\"multipleOf\": 0.01 \n\t\t\t\t},\n\t\t\t\t\"vat_amount\": {\n\t\t\t\t\t\"type\": \"number\",\n\t\t\t\t\t\"multipleOf\": 0.01 \n\t\t\t\t},\n\"total_amount_excl_discount_tax\": {\n\t\t\t\t\t\"type\": \"number\",\n\t\t\t\t\t\"multipleOf\": 0.01 \n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}"
+      },
+      "id": "d47ff7f8-ba8f-4dc2-91b4-f181151d9e63",
+      "name": "Structured Output Parser (โครงสร้าง Json Output ที่อยากให้เป็น)",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        432,
+        880
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "jsCode": "// ดึงข้อมูล Output จาก n8n (สมมติว่าข้อมูลที่ต้องการตรวจสอบอยู่ใน item แรก)\nconst outputData = items[0].json.output;\n\n// ตรวจสอบว่ามีข้อมูล financial_summary หรือไม่\nif (!outputData || !outputData.financial_summary) {\n  // เปลี่ยนการ return เพื่อรักษาโครงสร้างเดิมให้มากที่สุดหากมีปัญหาตั้งแต่ต้น\n  return [{ \n    json: { \n      output: {\n        status_check: \"มีปัญหา\", \n        error_check: \"ไม่พบข้อมูล 'output' หรือ 'financial_summary' ที่ต้องการตรวจสอบ\"\n      }\n    } \n  }];\n}\n\nconst summary = outputData.financial_summary;\nlet errors = [];\n\n// กำหนดค่าตัวเลขที่ต้องการตรวจสอบ (ดึงมาจาก summary)\nconst total_inc_discount_tax = summary.total_amount_inc_discount_tax;\nconst net_discount = summary.net_discount;\nconst total_excl_discount_inc_tax = summary.total_amount_excl_discount_inc_tax;\nconst vat_amount = summary.vat_amount;\nconst total_excl_discount_tax = summary.total_amount_excl_discount_tax;\n\n// ----------------------------------------------------\n// 1. ตรวจสอบว่าค่าใน financial_summary แต่ละ key >= 0 ทั้งหมดหรือไม่\n// ----------------------------------------------------\nconst keysToCheck = [\n    \"total_amount_inc_discount_tax\",\n    \"net_discount\",\n    \"total_amount_excl_discount_inc_tax\",\n    \"vat_amount\",\n    \"total_amount_excl_discount_tax\"\n];\n\nkeysToCheck.forEach(key => {\n    if (summary[key] < 0) {\n        errors.push(`1.1 ค่า ${key} ต้องไม่ติดลบ (ปัจจุบัน: ${summary[key]})`);\n    }\n    // เพิ่มการตรวจสอบว่าเป็นตัวเลขที่ถูกต้องด้วย\n    if (typeof summary[key] !== 'number' || isNaN(summary[key])) {\n        errors.push(`1.2 ค่า ${key} ไม่ใช่ตัวเลขที่ถูกต้อง (ปัจจุบัน: ${summary[key]})`);\n    }\n});\n\n// ----------------------------------------------------\n// 2. ตรวจสอบความสัมพันธ์ทางคณิตศาสตร์\n// ----------------------------------------------------\n\n// ใช้ค่า Tolerance เล็กน้อย (เช่น 0.01) สำหรับการเปรียบเทียบเลขทศนิยม เพื่อป้องกันปัญหา Floating Point Error\nconst TOLERANCE = 0.01;\n\n// ความสัมพันธ์ที่ 1: total_amount_inc_discount_tax − net_discount = total_amount_excl_discount_inc_tax\n// (A - B = C)\nconst relationship1_LHS = total_inc_discount_tax - net_discount;\nconst relationship1_RHS = total_excl_discount_inc_tax;\n\nif (Math.abs(relationship1_LHS - relationship1_RHS) > TOLERANCE) {\n    errors.push(`2.1 ความสัมพันธ์ 'total_amount_inc_discount_tax - net_discount = total_amount_excl_discount_inc_tax' ไม่ถูกต้อง`);\n    errors.push(`   - คำนวณได้: ${relationship1_LHS.toFixed(2)} | ค่าที่ปรากฏ: ${relationship1_RHS.toFixed(2)}`);\n}\n\n// ความสัมพันธ์ที่ 2: total_amount_excl_discount_inc_tax - vat_amount = total_amount_excl_discount_tax\n// (C - D = E)\nconst relationship2_LHS = total_excl_discount_inc_tax - vat_amount;\nconst relationship2_RHS = total_excl_discount_tax;\n\nif (Math.abs(relationship2_LHS - relationship2_RHS) > TOLERANCE) {\n    errors.push(`2.2 ความสัมพันธ์ 'total_amount_excl_discount_inc_tax - vat_amount = total_amount_excl_discount_tax' ไม่ถูกต้อง`);\n    errors.push(`   - คำนวณได้: ${relationship2_LHS.toFixed(2)} | ค่าที่ปรากฏ: ${relationship2_RHS.toFixed(2)}`);\n}\n\n// ----------------------------------------------------\n// สรุปผลการตรวจสอบ และรวมเข้ากับ outputData เดิม\n// ----------------------------------------------------\nlet status;\n\nif (errors.length === 0) {\n    status = \"OK\"; // ใช้ OK เพื่อระบุว่าไม่มีปัญหาตามข้อกำหนด\n    outputData.financial_check_status = status;\n} else {\n    status = \"ERROR\"; // ใช้ ERROR เพื่อระบุว่ามีปัญหา\n    outputData.financial_check_status = status;\n    outputData.financial_check_errors = errors; // เพิ่มรายการข้อผิดพลาดเข้าไปใน Object เดิม\n}\n\n// Return ผลลัพธ์ โดย Object ที่ return ต้องมีโครงสร้างตามที่ n8n ต้องการ: [{ json: { ... } }]\n// ซึ่งข้อมูลเดิมทั้งหมดอยู่ใน outputData แล้ว\nreturn [{ \n    json: { \n        output: outputData \n    } \n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        688
+      ],
+      "id": "ded4d630-0803-4bf3-951a-8dfd070a9d80",
+      "name": "Validation"
+    },
+    {
+      "parameters": {
+        "content": "## Tax Invoice Input Form\n",
+        "height": 244,
+        "width": 236,
+        "color": 2
+      },
+      "id": "5a1b686a-c73f-4d0d-8b9f-f6ea9e75874c",
+      "name": "Sticky Note23",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -640,
+        592
+      ],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Extract Tax Invoice Detail by using Typhoon-ocr\n",
+        "height": 244,
+        "width": 396,
+        "color": 6
+      },
+      "id": "14d70777-558d-4895-abf8-7787707e6c23",
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -368,
+        592
+      ],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Validation financial_summary\n",
+        "height": 244,
+        "width": 300,
+        "color": 3
+      },
+      "id": "4845d03b-a3e2-4b61-bb11-19ddb4a98cf8",
+      "name": "Sticky Note25",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        592,
+        592
+      ],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Analyze Tax Invoice & Send into Defined Structured Output Json Parser\n",
+        "height": 436,
+        "width": 460,
+        "color": 4
+      },
+      "id": "47119649-306d-4c8b-b735-8557dc0b3539",
+      "name": "Sticky Note26",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        80,
+        592
+      ],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=./{{ $json['Tax Invoice'].filename }}",
+        "dataPropertyName": "Tax_Invoice",
+        "options": {}
+      },
+      "id": "9bca2160-8909-44f8-9c1b-239fb53a936b",
+      "name": "Write File to Disk1",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        -176,
+        80
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        48,
+        80
+      ],
+      "id": "abb47131-7393-41a8-8acf-4f3f4828e7bd",
+      "name": "Execute Command",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=python -c \"import sys, os; os.environ['TYPHOON_API_KEY'] = '<TYPHOON_API_KEY>'; from typhoon_ocr import ocr_document; sys.stdout.reconfigure(encoding='utf-8'); input_path = sys.argv[1]; text = ocr_document(input_path); print(text)\" \"./{{$json['Tax Invoice'].filename}}\""
+      },
+      "id": "f2ba1615-10ac-4736-96a1-cc32561279e9",
+      "name": "Extract Text with Typhoon OCR",
+      "type": "n8n-nodes-base.executeCommand",
+      "position": [
+        -112,
+        672
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": "x-ai/grok-4-fast",
+        "options": {}
+      },
+      "id": "629993eb-e02d-4398-baee-e53ed1a3b1bc",
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "position": [
+        128,
+        880
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openRouterApi": {
+          "id": "yyiciEjAh7iXa81S",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        880
+      ],
+      "id": "653ed385-2be3-4286-a027-6afd06f03651",
+      "name": "Think"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        288
+      ],
+      "id": "0242bccc-5cca-473d-955f-72e702c74fba",
+      "name": "Think1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        272,
+        80
+      ],
+      "id": "c58891f7-2b49-4236-a998-730fe541fe8f",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=analyze this message:\n{{ $json.stdout }}\nthen save into defined structured output parser which has definition key below:\n\n\n\"invoice_no\": \n\"Unique sequential identifier for the document.\",\n\"issue_date\": \n\"The date the tax invoice was officially issued (Format: YYYY-MM-DD).\",\n\"seller_name\": \n\"Full legal name of the company issuing the invoice.\",\n\"seller_tax_id\": \n\"13-digit Tax Identification Number (TIN) of the issuing company.\",\n\"seller_address\": \n\"Full registered street address, including any building/floor/room details and branch information (if specified).\",\n\"buyer_firstname\": \n\"The recipient's first name, excluding any honorifics or titles (e.g., นาย, นาง, Mr., Ms.).\",\n\"buyer_lastname\": \n\"The recipient's last name, excluding any honorifics or titles.\",\n\"buyer_tax_id\": \n\"13-digit Tax ID of the recipient.\",\n\"buyer_address\": \n\"The registered address of the buyer/recipient.\",\n\"item_name\": \n\"Description of the goods or service purchased.\",\n\"item_qty\": \n\"The number of units of the item.\",\n\"unit_price\": \n\"The price per single unit of the item (before discount/VAT).\",\n\"line_net_total\": \n\"(item_qty * unit_price),\n\"total_amount_inc_discount_tax\": \n\"The initial amount charged for goods or services before applying any discounts and taxes.\",\n\"net_discount\": \n\"The total monetary value of the reduction subtracted from the total_amount_inc_discount_tax.\",\n\"total_amount_excl_discount_inc_tax\": \n\"The selling price of the goods or services after the net_discount has been subtracted. (This amount includes the VAT/Tax).\",\n\"vat_amount\":\n\"The monetary value of the statutory Value Added Tax (or Sales Tax) calculated and charged on the discounted base price.\",\n\"total_amount_excl_discount_tax\":\n\"The final amount remaining after both the net_discount and the vat_amount have been subtracted.\"",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a Tax Consultant with 10 years of experience reading and interpreting tax invoices at a Big 4 firm.\n\n<Context>\nGoals: The primary goal is to extract the data, especially the following fields, with zero error tolerance: invoice_no, issue_date, seller_tax_id, buyer_tax_id, item_qty, unit_price, line_net_total, total_amount_inc_discount_tax, net_discount, total_amount_excl_discount_inc_tax, vat_amount, total_amount_excl_discount_tax. Minor inaccuracies in other fields may be tolerated.\n</Context>\n\n<examples>\n{\n  \"invoice_no\": \"15062004005552\",\n  \"issue_date\": \"2023-02-11\",\n  \"seller_details\": {\n    \"seller_name\": \"บจ. บิ๊กซี ซูเปอร์เซ็นเตอร์ (สามย่านมิตรทาวน์) สาขาที่ 01212\",\n    \"seller_tax_id\": \"0107536000633\",\n    \"seller_address\": \"944/1, ห้องB1U001, ชั้น B1, สามย่านมิตรทาวน์, ถนนพระรามที่ 4, แขวงวังใหม่, เขตปทุมวัน, กรุงเทพมหานคร 10330\"\n  },\n  \"buyer_details\": {\n    \"buyer_firstname\": \"กาหลง\",\n    \"buyer_lastname\": \"รัตนทิพย์\",\n    \"buyer_tax_id\": \"1234567891011\",\n    \"buyer_address\": \"1120 ถนนลาดพร้าว ซอยลาดพร้าว 35 แขวงจอมพล เขตจตุจักร กรุงเทพมหานคร 10510\"\n  },\n  \"line_items\": [\n    {\n      \"item_name\": \"8859425091640 เบสิโคถุงผ้าสปันบอน 30x50x15ซม. (หน่วย: 1 ชิ้น)\",\n      \"item_qty\": 1.00,\n      \"unit_price\": 6.00,\n      \"line_net_total\": 6.00\n    },\n    {\n      \"item_name\": \"88550029006655 ซอลส์ยาสีฟันเฟรซ140คู่ (หน่วย: 1 ชิ้น)\",\n      \"item_qty\": 1.00,\n      \"unit_price\": 89.00,\n      \"line_net_total\": 89.00\n    },\n    {\n      \"item_name\": \"8850040221301 ซัลชอร์ดซอฟท์แพค 150*3 (หน่วย: 3 แพ็ค)\",\n      \"item_qty\": 1.00,\n      \"unit_price\": 89.00,\n      \"line_net_total\": 89.00\n    },\n    {\n      \"item_name\": \"88594731009982 โทฟูซังโปรตีนชอคน้ำตาล 0% 350มล (หน่วย: 1 ชิ้น)\",\n      \"item_qty\": 1.00,\n      \"unit_price\": 43.00,\n      \"line_net_total\": 43.00\n    }\n  ],\n  \"financial_summary\": {\n    \"total_amount_inc_discount_tax\": 212.15,\n    \"net_discount\":0,\n    \"total_amount_excl_discount_inc_tax\":212.15\n    \"vat_amount\": 14.85,\n    \"total_amount_excl_discount_tax\": 227.00\n  }\n}\n</examples>\n\nGeneral Locational Observations:\nitem_qty, unit_price, line_net_total: Highly likely to be found within the line-item table/grid, situated near the product descriptions.\n\ntotal_amount_inc_discount_tax, net_discount, total_amount_excl_discount_inc_tax, vat_amount, total_amount_excl_discount_tax:Usually found outside the main table, typically near the footer or in the summary/total section of the document.\n\nKeyword Reference Guidelines:\nKey Field\tEnglish Anchor Words (Examples)\tThai Anchor Words (Examples)\nitem_qty\tQuantity, Qty, Units, Amount, No.\tจำนวน, ปริมาณ, หน่วย, ชิ้น, รวม\nunit_price\tUnit Price, Price/Unit, Rate, Per Unit, Cost\tราคา/หน่วย, หน่วยละ, ต่อหน่วย, ราคา, บาท\nline_net_total\tTotal, Line Total, Sub Total, Net Amount, Sum\tรวม, รวมสุทธิ, ยอดรวม, จำนวนเงิน, สุทธิ\ntotal_amount_inc_discount_tax\tGrand Total, Total (Inc Tax), Total Amount, Gross Total, Subtotal\tยอดรวมทั้งสิ้น, ยอดรวมก่อนหักส่วนลด, ยอดรวม, ราคารวม, รวมทั้งหมด\nnet_discount\tDiscount, Total Discount, Deduction, Allowance, Less Discount\tส่วนลด, ส่วนลดรวม, ลดสุทธิ, หักส่วนลด, ลด\ntotal_amount_excl_discount_inc_tax\tNet Payable, Amount Due, Total After Discount, Total Due, Net Total\tยอดชำระสุทธิ, ยอดรวมหลังหักส่วนลด, จำนวนเงิน, สุทธิ, ยอดรวม\nvat_amount\tVAT, Tax Amount, Sales Tax, GST, Tax\tภาษีมูลค่าเพิ่ม, ภาษี, ภ.พ., แวต, อากร\ntotal_amount_excl_discount_tax\tNet Excl Tax, Tax Base, Net Goods Total, Subtotal Excl Tax, Pre-Tax Total\tยอดก่อนภาษี, ยอดสุทธิก่อนภาษี, ราคาสินค้า, ยอดรวมไม่รวมภาษี, ฐานภาษี\n\n\n<Rule>\n1. All extracted numerical values (e.g., prices, totals, discounts, taxes, quantities) must be converted to their absolute positive value.\n\n2. If string data is unknown, leave it empty. If number data is unknown, set it to 0.\n\n3. If the initial extracted values do not satisfy the required financial equations, the model must:\n\nAnalyze the document structure and adjacent text (based on Keyword Reference Guidelines) to identify alternative candidate numbers.\n\nAttempt to reconcile and recalculate the summary totals using the identified candidates, strictly enforcing a 7% VAT rate assumption for validation where required.\n</Rule>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        672
+      ],
+      "id": "9db62256-5802-4ab3-922b-c877018b307a",
+      "name": "Analyze Tax Invoice"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Write File to Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract Text with Typhoon OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tax Invoice Form": {
+      "main": [
+        [
+          {
+            "node": "Write File to Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser (โครงสร้าง Json Output ที่อยากให้เป็น)": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Analyze Tax Invoice",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validation": {
+      "main": [
+        []
+      ]
+    },
+    "Extract Text with Typhoon OCR": {
+      "main": [
+        [
+          {
+            "node": "Analyze Tax Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyze Tax Invoice",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Analyze Tax Invoice",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Tax Invoice": {
+      "main": [
+        [
+          {
+            "node": "Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e4d7f0ca-f246-4595-99dc-5cfd92ea9c43",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91df12515cd6a283b655811ae8756ab40523fa0fb71571e55bfaabd1064045bb"
+  },
+  "id": "cgPpnzxSxzvZgaap",
+  "tags": []
+}

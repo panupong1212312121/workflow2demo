@@ -1,0 +1,959 @@
+{
+  "name": "Chatbot + Rag (2nd draft)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "7f766ef8-f653-4766-bf62-8bd37203a5a9",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -976,
+        448
+      ],
+      "id": "bd0c893c-fe4f-4131-96a8-50ce6c7238dd",
+      "name": "Webhook",
+      "webhookId": "7f766ef8-f653-4766-bf62-8bd37203a5a9"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Answer this question \"{{ $json.body.events[0].message.text }}\" in Thai.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an AI agent specialized in company's policy.\n\n<Rule>\n1. Always use your Pinecone tool to search through company's policy.\n\n2. When answering the user's question, always cite\nyour sources as far as: what document you got it\nfrom, what page it was from, what section, and an\nexact text based quote from the original source\n\n3.Strictly omit all double quotes in your response.\n\n4. Respond without starting a new line (Don't use \\n).\n\n5. The output must not contain symbols or non-alphanumeric characters.\n</Rule>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        -96
+      ],
+      "id": "ad8fc425-56a3-444c-a0a5-8193999eef04",
+      "name": "Text"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Answer this question \"{{ $json.stdout }}\" input in Thai.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an AI agent specialized in company's policy.\n\n<Rule>\n1. Always use your Pinecone tool to search through company's policy.\n\n2. When answering the user's question, always cite\nyour sources as far as: what document you got it\nfrom, what page it was from, what section, and an\nexact text based quote from the original source\n\n3.Strictly omit all double quotes in your response.\n\n4. Respond without starting a new line (Don't use \\n).\n\n5. The output must not contain symbols or non-alphanumeric characters.\n</Rule>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        448
+      ],
+      "id": "93938d79-b4b3-45fa-9c62-05f870234dae",
+      "name": "Image"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Answer this question \"{{ $json.content.parts[0].text }}\" in Thai.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an AI agent specialized in company's policy.\n\n<Rule>\n1. Always use your Pinecone tool to search through company's policy.\n\n2. When answering the user's question, always cite\nyour sources as far as: what document you got it\nfrom, what page it was from, what section, and an\nexact text based quote from the original source\n\n3.Strictly omit all double quotes in your response.\n\n4. Respond without starting a new line (Don't use \\n).\n\n5. The output must not contain symbols or non-alphanumeric characters.\n</Rule>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        848
+      ],
+      "id": "29309478-a728-42e1-8b50-003f41a28676",
+      "name": "Audio"
+    },
+    {
+      "parameters": {
+        "content": "## Extract Image's Detail by using Typhoon-ocr & Transform Data\n",
+        "height": 244,
+        "width": 556,
+        "color": 6
+      },
+      "id": "92ceb277-0a11-4271-a777-4bb262d2a7fb",
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -336,
+        368
+      ],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=./image",
+        "options": {}
+      },
+      "id": "e1066d3b-7b65-4531-a6d0-5cadfad08272",
+      "name": "Write File to Disk",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        -288,
+        448
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.events[0].message.type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "7ebb31b1-7a66-4955-833a-cea57f8d80ae"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0fdf332e-171d-49d1-ab31-e71dc2ab05f1",
+                    "leftValue": "={{ $json.body.events[0].message.type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d649a061-4af0-4e58-a704-fa97fdc3f04b",
+                    "leftValue": "={{ $json.body.events[0].message.type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -768,
+        432
+      ],
+      "id": "d8e3bfde-3cc0-43de-9de7-b55cb9dc12ad",
+      "name": "แยก case input ว่าเป็น text, image หรือ audio"
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "python -c \"import sys, os; os.environ['TYPHOON_API_KEY'] = '<TYPHOON_API_KEY>'; from typhoon_ocr import ocr_document; sys.stdout.reconfigure(encoding='utf-8'); input_path = sys.argv[1]; text = ocr_document(input_path); print(text)\" \"./image\""
+      },
+      "id": "907ee8de-76b3-4f24-be41-d812d888719c",
+      "name": "Extract Text with Typhoon OCR",
+      "type": "n8n-nodes-base.executeCommand",
+      "position": [
+        -96,
+        448
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "=https://api-data.line.me/v2/bot/message/{{ $json.body.events[0].message.id }}/content",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {channel access token}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -544,
+        448
+      ],
+      "id": "07df29a8-217c-410e-aad4-0d51ea881e82",
+      "name": "Get Image"
+    },
+    {
+      "parameters": {
+        "toolDescription": "**Strictly** Always use this tool to talk to your knowledge base.",
+        "method": "POST",
+        "url": "https://prod-1-data.ke.pinecone.io/assistant/chat/n8n",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pineconeApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.body.events[0].message.text }}\"\n    }\n  ],\n  \"stream\": false,\n  \"model\": \"gpt-4o\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        128
+      ],
+      "id": "ca189d53-1ce0-4e91-ad98-a388eb92963c",
+      "name": "Document Knowledge",
+      "credentials": {
+        "pineconeApi": {
+          "id": "o1I2Iqd3jBeTa6Gg",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "**Strictly** Always use this tool to talk to your knowledge base.",
+        "method": "POST",
+        "url": "https://prod-1-data.ke.pinecone.io/assistant/chat/n8n",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pineconeApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $('ตัดเว้นบรรทัดในข้อความออก').item.json.stdout }}\"\n    }\n  ],\n  \"stream\": false,\n  \"model\": \"gpt-4o\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        608
+      ],
+      "id": "2c759e0e-46bb-449e-a481-d4350ab3e1f8",
+      "name": "Document Knowledge 2",
+      "credentials": {
+        "pineconeApi": {
+          "id": "o1I2Iqd3jBeTa6Gg",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "**Strictly** Always use this tool to talk to your knowledge base.",
+        "method": "POST",
+        "url": "https://prod-1-data.ke.pinecone.io/assistant/chat/n8n",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pineconeApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $('ตัดเว้นบรรทัดในข้อความออก 2').item.json.content.parts[0].text }}\"\n    }\n  ],\n  \"stream\": false,\n  \"model\": \"gpt-4o\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        1040
+      ],
+      "id": "a4e770c1-6e3c-4cca-b95c-18a4342b6f1b",
+      "name": "Document Knowledge 3",
+      "credentials": {
+        "pineconeApi": {
+          "id": "o1I2Iqd3jBeTa6Gg",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {channel access token}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $('Webhook').item.json.body.events[0].replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.output }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1104,
+        448
+      ],
+      "id": "8e5afdd0-dbfb-467a-87ee-58f0457737ba",
+      "name": "Reply User"
+    },
+    {
+      "parameters": {
+        "content": "## RAG กรณี input เป็นข้อความ",
+        "height": 432,
+        "width": 704
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -144
+      ],
+      "id": "d9346ef4-d53d-4485-a4da-e715c8f83b6c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## RAG กรณี input เป็นรูปภาพ",
+        "height": 448,
+        "width": 496,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        288,
+        304
+      ],
+      "id": "197718e3-305e-4272-a4d5-661a97e22648",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Chatbot (Line) ส่งข้อความตอบกลับ user",
+        "height": 240,
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        368
+      ],
+      "id": "4791dd22-ea27-4dc8-b078-45981fd63cba",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Chatbot (Line) รับข้อความ, รูปภาพ, หรือเสียงอย่างใดอย่างหนึ่งจาก user",
+        "height": 272,
+        "width": 336,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1152,
+        336
+      ],
+      "id": "666bee51-e6a8-49e5-aa03-17bb17b076de",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## RAG กรณี input เป็นเสียง",
+        "height": 432,
+        "width": 496,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        288,
+        768
+      ],
+      "id": "286b9de8-b8de-4cf7-9609-43e6a98f6645",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "url": "=https://api-data.line.me/v2/bot/message/{{ $json.body.events[0].message.id }}/content",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {channel access token}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -544,
+        848
+      ],
+      "id": "be810127-7484-4f09-ad42-4a071263b099",
+      "name": "Get Audio"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        848
+      ],
+      "id": "d4302246-4e52-4096-ae6c-be94fa162854",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1HpVjC6Klk7WP4RG",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ดึงข้อมูล Input แรก (ปกติ n8n จะจัดการข้อมูลเป็น array ของ items)\nconst item = $input.item.json;\n\n// กำหนดชื่อ key ที่ต้องการแก้ไข\nconst keyToModify = \"stdout\";\n\n// 1. ตรวจสอบว่า key นั้นมีอยู่จริงและเป็น string ก่อน\nif (item[keyToModify] && typeof item[keyToModify] === 'string') {\n  \n  // 2. ใช้ .replace() กับ Regular Expression เพื่อแทนที่ 'ทุกครั้ง' ที่พบ \\n \n  //    (ใช้ /g flag)\n  const modifiedValue = item[keyToModify].replace(/\\n/g, ' ');\n  \n  // 3. กำหนดค่าใหม่กลับเข้าไปใน item\n  item[keyToModify] = modifiedValue;\n}\n\n// ส่ง item ที่แก้ไขแล้วออกไป\nreturn item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        448
+      ],
+      "id": "88b339e5-dd92-4009-9974-1a7fc667dc4f",
+      "name": "ตัดเว้นบรรทัดในข้อความออก"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ดึงข้อมูล Input แรก (item แรกใน array)\nconst item = $input.item.json;\n\n// กำหนด path ไปยัง string ที่ต้องการแก้ไข: content.parts[0].text\nconst textPath = item.content?.parts?.[0]?.text;\n\n// 1. ตรวจสอบว่า path นั้นเข้าถึงได้ และเป็น string ก่อน\nif (textPath && typeof textPath === 'string') {\n  \n  // 2. ใช้ .replace() กับ Regular Expression เพื่อแทนที่ 'ทุกครั้ง' ที่พบ \\n \n  //    (ใช้ /g flag)\n  const modifiedValue = textPath.replace(/\\n/g, ' ');\n  \n  // 3. กำหนดค่าใหม่กลับเข้าไปในตำแหน่งเดิม\n  item.content.parts[0].text = modifiedValue;\n}\n\n// ส่ง item ที่แก้ไขแล้วออกไป\nreturn item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        848
+      ],
+      "id": "68c115fa-2cfa-420b-8ba0-b9278a3c221d",
+      "name": "ตัดเว้นบรรทัดในข้อความออก 2"
+    },
+    {
+      "parameters": {
+        "content": "## Speech2Text & Transform Data\n",
+        "height": 244,
+        "width": 556,
+        "color": 6
+      },
+      "id": "40678518-9d81-4abb-af5b-2c25dde6a2a6",
+      "name": "Sticky Note25",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -336,
+        768
+      ],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# Node ที่ใช้",
+        "height": 480,
+        "width": 1168,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -720
+      ],
+      "id": "807af77d-10e7-43b7-bcc6-c3aa76c24988",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "7f766ef8-f653-4766-bf62-8bd37203a5a9",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        -624
+      ],
+      "id": "16787dae-1724-479b-b145-148a75062191",
+      "name": "Webhook1",
+      "webhookId": "7f766ef8-f653-4766-bf62-8bd37203a5a9",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "84e485fb-f19d-488a-8599-7db1fccaa787"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -192,
+        -624
+      ],
+      "id": "b26a6630-a8d6-4f8c-ab14-7be92a279659",
+      "name": "Switch",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32,
+        -624
+      ],
+      "id": "dba5f155-98ca-421a-af6c-b584a9490bb7",
+      "name": "HTTP Request",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=./image",
+        "options": {}
+      },
+      "id": "4c53794b-8192-47f7-a654-29e559102790",
+      "name": "Write File to Disk1",
+      "type": "n8n-nodes-base.readWriteFile",
+      "position": [
+        272,
+        -624
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        496,
+        -624
+      ],
+      "id": "53d4a495-c1bd-4c6d-81a2-f73aa96d9a82",
+      "name": "Execute Command",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -416
+      ],
+      "id": "22148b33-56b4-4929-b21a-9651d0ef34f0",
+      "name": "Code in JavaScript",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        16,
+        -432
+      ],
+      "id": "00c7e357-dc43-4039-81d5-2fd3d57f32fc",
+      "name": "Transcribe a recording1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1HpVjC6Klk7WP4RG",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        -432
+      ],
+      "id": "9d2db16d-3711-42f8-a27c-d2b547eb4c4e",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# Workflow",
+        "height": 1424,
+        "width": 2576,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        -192
+      ],
+      "id": "7de766fc-f673-471c-a20a-ae2741031d7e",
+      "name": "Sticky Note5",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        128
+      ],
+      "id": "b30a3cd6-a2a5-4e8d-a50e-6f83f5241847",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1HpVjC6Klk7WP4RG",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -416
+      ],
+      "id": "9a07c252-959e-427d-b288-ea54e820a7fa",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1HpVjC6Klk7WP4RG",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "แยก case input ว่าเป็น text, image หรือ audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text": {
+      "main": [
+        [
+          {
+            "node": "Reply User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image": {
+      "main": [
+        [
+          {
+            "node": "Reply User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio": {
+      "main": [
+        [
+          {
+            "node": "Reply User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write File to Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract Text with Typhoon OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "แยก case input ว่าเป็น text, image หรือ audio": {
+      "main": [
+        [
+          {
+            "node": "Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    "Extract Text with Typhoon OCR": {
+      "main": [
+        [
+          {
+            "node": "ตัดเว้นบรรทัดในข้อความออก",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image": {
+      "main": [
+        [
+          {
+            "node": "Write File to Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document Knowledge": {
+      "ai_tool": [
+        [
+          {
+            "node": "Text",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document Knowledge 2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Image",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document Knowledge 3": {
+      "ai_tool": [
+        [
+          {
+            "node": "Audio",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Audio": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "ตัดเว้นบรรทัดในข้อความออก 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ตัดเว้นบรรทัดในข้อความออก": {
+      "main": [
+        [
+          {
+            "node": "Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ตัดเว้นบรรทัดในข้อความออก 2": {
+      "main": [
+        [
+          {
+            "node": "Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write File to Disk1": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Image",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Audio",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8c537257-d3d9-451b-b252-e1ac67ba0369",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91df12515cd6a283b655811ae8756ab40523fa0fb71571e55bfaabd1064045bb"
+  },
+  "id": "5oVykHCm2S3ozOsr",
+  "tags": []
+}

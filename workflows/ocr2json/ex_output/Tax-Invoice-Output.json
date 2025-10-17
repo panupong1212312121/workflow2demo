@@ -1,0 +1,39 @@
+[
+  {
+    "output": {
+      "invoice_no": "ACE25090007559",
+      "issue_date": "2025-09-13",
+      "seller_details": {
+        "seller_name": "บริษัท เอคอมเมิร์ซ จำกัด",
+        "seller_tax_id": "0105566095051",
+        "seller_address": "689 อาคารภิรัชทาวเวอร์ ชั้น 33 ถนนสุขุมวิท แขวงคลองตันเหนือ เขตวัฒนา กรุงเทพมหานคร 10110"
+      },
+      "buyer_details": {
+        "buyer_firstname": "กาญพงศ์",
+        "buyer_lastname": "จินดารัตน์",
+        "buyer_tax_id": "1103702660612",
+        "buyer_address": "21-25 แขวงสี่พระยา เขตบางรัก จังหวัดกรุงเทพมหานคร 10500"
+      },
+      "line_items": [
+        {
+          "item_name": "Vaseline Aloe Soothe Lotion Green 320 ml",
+          "item_qty": 2,
+          "unit_price": 195.33,
+          "line_net_total": 390.65
+        }
+      ],
+      "financial_summary": {
+        "total_amount_inc_discount_tax": 390.65,
+        "net_discount": 110.28,
+        "total_amount_excl_discount_inc_tax": 300,
+        "vat_amount": 19.63,
+        "total_amount_excl_discount_tax": 280.37
+      },
+      "financial_check_status": "ERROR",
+      "financial_check_errors": [
+        "2.1 ความสัมพันธ์ 'total_amount_inc_discount_tax - net_discount = total_amount_excl_discount_inc_tax' ไม่ถูกต้อง",
+        "   - คำนวณได้: 280.37 | ค่าที่ปรากฏ: 300.00"
+      ]
+    }
+  }
+]
